@@ -14,20 +14,25 @@ router.post('/drive', asyncHandler(async (req, res) => {
     return res.json({"key": key})    
 }))
 
+
+
 // list dir
 // download file
 router.get('/drive/:id/*', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
-    var filepath = req.url.replace(`/drive/${req.params.id}`, "")
-
-    if (filepath === ""){
+    var filepath = req.url.replace(`/drive/${req.params.id}`, "").trim()
+   
+    if (filepath === undefined){
         filepath = "/"
     }
 
     var entry = null
 
+    
+
     try {
         entry = await driveObj.promises.stat(filepath)
+        
     } catch (e) {
         return res.status(404).json('');
     }
@@ -43,5 +48,8 @@ router.get('/drive/:id/*', asyncHandler(async (req, res) => {
 
 }))
 
+router.get('/drive/:id', asyncHandler(async (req, res) => {
+    return res.redirect(`/drive/${req.params.id}/`)
+}));
 
 module.exports = router

@@ -2,7 +2,7 @@
 const chalk = require('chalk');
 
 const config = require('./config')
-const app = require('./api/app.js')
+const app = require('./http/app.js')
 const process = require('process');
 
 async function init(){
