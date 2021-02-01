@@ -6,6 +6,7 @@ const { Client: HyperspaceClient } = require('hyperspace')
 const HyperDrive = require('hyperdrive')
 const config = require('./config.js')
 const db  = JSON.parse(fs.readFileSync('db/drives.json'));
+const cache = require('./cache.js')
 
 let client
 let server
@@ -27,8 +28,12 @@ async function create(){
             console.log(chalk.red('Error saving key to db'));
         }
     });
-
+    cache.drives[key] = drive
     return key
+}
+
+async function get(id){
+    return cache.drives[id]
 }
 
 async function load(){
@@ -38,7 +43,8 @@ async function load(){
         await client.replicate(drive)
         await new Promise(r => setTimeout(r, 3e3)) // just a few seconds
         await client.network.configure(drive, {announce: false, lookup: false})
-        console.log(chalk.blue(`✓ (HyperSpace Drive) loading ${item}`))
+        console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item}`))
+        cache.drives[item] = drive
     })
 }
 
@@ -77,5 +83,6 @@ async function ensureHyperSpace () {
 module.exports = {
     ensureHyperSpace: ensureHyperSpace,
     create: create,
-    load: load
+    load: load,
+    get: get
 }

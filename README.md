@@ -16,6 +16,9 @@
         - Result :: `{"key": "5318aa95678cb364059117f868a272948af84df03f307e8351592af31ba23af1"`
 
             ![](docs/create.png)
+    
+    - `GET /drive/{id}/{path}` List (for dirs) - Download (for files)
+        - Result : `{"files": ["a.txt"]}`
 
 }`
 
