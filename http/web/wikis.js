@@ -22,7 +22,6 @@ router.get('/drive/:id/wikis', asyncHandler(async (req, res) => {
                 wikis.push({"name": file, "url": `/drive/${req.params.id}/wikis/${file}`})
             }
         })
-        console.log(wikis)
         res.render('wikis/wikis.mustache', {wikis : wikis});
     } catch (e) {
         console.log(e)
@@ -41,28 +40,29 @@ router.get('/drive/:id/wikis/:wikiname', asyncHandler(async (req, res) => {
         return res.send(content)
        
     } catch (e) {
-        console.log(e)
         return res.status(404).json('');
     }
 }))
 
-// FILE
+// MD File
 router.get('/drive/:id/wikis/:wikiname/:filename', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
     var filepath = `/${req.params.wikiname}/${req.params.filename}`
+    var encoding = 'utf-8'
+    var filename = req.params.filename
+
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
-        var content = await  driveObj.promises.readFile(filepath, 'utf8');
+        var content = await  driveObj.promises.readFile(filepath, encoding);
         return res.send(content)
        
     } catch (e) {
-        console.log(e)
-        if (req.params.filename == "README.md"){
+        if (filename == "README.md"){
             filepath = `/${req.params.wikiname}/readme.md`
             try{
                 entry = await driveObj.promises.stat(filepath)
-                var content = await  driveObj.promises.readFile(filepath, 'utf8');
+                var content = await  driveObj.promises.readFile(filepath, encoding);
                 return res.send(content)
             }catch(e){
                 var content =`# ${req.params.wikiname}`
@@ -73,6 +73,23 @@ router.get('/drive/:id/wikis/:wikiname/:filename', asyncHandler(async (req, res)
     }
 }))
 
+
+// images Image
+router.get('/drive/:id/wikis/:wikiname/img/:filename', asyncHandler(async (req, res) => {
+    var driveObj = await drive.get(req.params.id)
+    var filepath = `/${req.params.wikiname}/${req.params.filename}`
+    var encoding = 'binary'
+
+    var entry = null
+    try {
+        entry = await driveObj.promises.stat(filepath)
+        var content = await  driveObj.promises.readFile(filepath, encoding);
+        return res.send(content)
+       
+    } catch (e) {
+        return res.status(404).json('');
+    }
+}))
 
 module.exports = router
 
