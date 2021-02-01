@@ -30,10 +30,10 @@ router.get('/drive/:id/wikis', asyncHandler(async (req, res) => {
     }
 }))
 
-
-router.get('/drive/:id/wikis/:name', asyncHandler(async (req, res) => {
+// WIKI index page
+router.get('/drive/:id/wikis/:wikiname', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
-    var filepath = `/${req.params.name}/src/index.html`
+    var filepath = `/${req.params.wikiname}/index.html`
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
@@ -42,6 +42,33 @@ router.get('/drive/:id/wikis/:name', asyncHandler(async (req, res) => {
        
     } catch (e) {
         console.log(e)
+        return res.status(404).json('');
+    }
+}))
+
+// FILE
+router.get('/drive/:id/wikis/:wikiname/:filename', asyncHandler(async (req, res) => {
+    var driveObj = await drive.get(req.params.id)
+    var filepath = `/${req.params.wikiname}/${req.params.filename}`
+    var entry = null
+    try {
+        entry = await driveObj.promises.stat(filepath)
+        var content = await  driveObj.promises.readFile(filepath, 'utf8');
+        return res.send(content)
+       
+    } catch (e) {
+        console.log(e)
+        if (req.params.filename == "README.md"){
+            filepath = `/${req.params.wikiname}/readme.md`
+            try{
+                entry = await driveObj.promises.stat(filepath)
+                var content = await  driveObj.promises.readFile(filepath, 'utf8');
+                return res.send(content)
+            }catch(e){
+                var content =`# ${req.params.wikiname}`
+                return res.send(content)
+            }            
+        }
         return res.status(404).json('');
     }
 }))
